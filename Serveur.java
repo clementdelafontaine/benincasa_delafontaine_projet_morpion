@@ -13,10 +13,10 @@ public class Serveur implements Runnable {
     private BufferedReader in;
     private PrintWriter out;
     private ServerSocket sockserv = null;
-    private Socket sockcli = null;
+    private Socket socketClient = null;
     private String message;
-    private String clientsEnJeu[];
-    private String clientsEnAttente[];
+    private InetSocketAddress clientsEnJeu[];
+    private InetSocketAddress clientsEnAttente[];
 
     public Serveur(){
         try {
@@ -26,21 +26,21 @@ public class Serveur implements Runnable {
 
     public boolean connexion() {
         try {
-            sockcli = sockserv.accept(); // Attente  requête client
+            socketClient = sockserv.accept(); // Attente  requête client
             return true;
         } catch (Exception e) { return false; }
     }
 
-    public String getSockcli(){
-        return sockcli.toString();
+    public String getsocketClient(){
+        return socketClient.toString();
     }
 
     public void run() {
         try {
 
             // Création de flux de communication
-            in = new BufferedReader(new InputStreamReader(sockcli.getInputStream()));
-            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(sockcli.getOutputStream())), true);
+            in = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
+            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream())), true);
             
             // Création
 
@@ -51,21 +51,23 @@ public class Serveur implements Runnable {
 
                 if (message.equals("103")) {
                     // Vérifier s'il y a des joueurs dans la liste d'attente
-                    if (clientsEnAttente.length % 2 != 0) {
+                    if (clientsEnAttente.length% 2 != 0) {
                         // Lancer le thread avec la dernière personne de la liste
 
+                    } else { // Mettre le nouveau client en liste d'attente
+                        clientsEnAttente[0] = (InetSocketAddress)socketClient.getRemoteSocketAddress();
                     }
-                    
+
                 }
 
                 out.flush();
 
-                if(mess.substring(0, 4).equals("stop")){
+                if(message.substring(0, 4).equals("stop")){
                     break;
                 }
             }
 
-            sockcli.close(); // Fermeture port de communication
+            socketClient.close(); // Fermeture port de communication
         } catch (Exception e) {
             System.out.println("Déconnexion du client : "+e);
         }
