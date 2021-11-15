@@ -21,7 +21,6 @@ public class ClientMorpion {
             // lecture message d'entree
             String message = "";
             while((message = in.readLine())==null) ;
-            // Scanner sc = new Scanner(System.in);
                     
             // 104 : partie terminée
             while (!message.equals("104"))
@@ -29,23 +28,33 @@ public class ClientMorpion {
                 try
                 {
                     switch (message) {
-                        case "100":
-                        System.out.println("En attente d'un opposant ... \n");
-                        break;
+                            // case "100":
+                            // System.out.println("En attente d'un opposant ... \n");
+                            // break;
                         case "101":
-                        // Print tableau de jeu
-                        System.out.println("C'est au tour de l'adversaire \n");
+                            // Print tableau de jeu
+                            System.out.println("C'est au tour de l'adversaire \n");
                         break;
                         // End of game
                         case "102":
-                        System.out.println("En attente d'un opposant ... \n");
+                            System.out.println("En attente d'un opposant ... \n");
                         break;
                         case "201":
-                        System.out.println("Lancement de la partie \n");
+                            System.out.println("Lancement de la partie \n");
                         break;
-                        case "202":
-                        System.out.println("A votre tour, saisir une case : ligne, colonne \n");
-
+                        case "100": //202
+                            System.out.println("A votre tour, saisir une case : \"ligne colonne\"");
+                            Scanner sc = new Scanner(System.in);
+                            int ligne = sc.nextInt();
+                            int colonne = sc.nextInt();
+                            System.out.println("L"+ligne+":C"+colonne);
+                            out.println("106");
+                            out.println(ligne);
+                            out.println(colonne);
+                        break;
+                        case "106":
+                            while((message = in.readLine())==null) ;
+                            System.out.println(message);
                         break;
                     }
                     while((message = in.readLine())==null);
