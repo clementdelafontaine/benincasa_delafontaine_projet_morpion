@@ -39,6 +39,16 @@ public class ClientMorpion {
                         // Print tableau de jeu
                         System.out.println("C'est au tour de l'adversaire \n");
                         break;
+                        // End of game
+                        case "102":
+                        System.out.println("En attente d'un opposant ... \n");
+                        break;
+                        case "201":
+                        System.out.println("Lancement de la partie \n");
+                        break;
+                        case "202":
+                        System.out.println("A votre tour, saisir une case : ligne, colonne \n");
+                        break;
                     }
 
                 }
