@@ -19,34 +19,37 @@ public class AppServ implements Runnable{
 
 	public static void main(String[] args){
 		Socket[] clients = new Socket[2];
-		int cpt = 0;
+		int compteurAttente = 0;
 		String message = "";
 		try {
 				ServerSocket sockserv=null;
 				sockserv = new ServerSocket (1234); //création socket serveur
 			while(true){
-				clients[cpt] = sockserv.accept(); //attente requête client
-				BufferedReader in = new BufferedReader(new InputStreamReader(clients[cpt].getInputStream()));
-				PrintWriter out = new PrintWriter(new OutputStreamWriter(clients[0].getOutputStream()),true);
-				message = in.readLine();
+				clients[compteurAttente] = sockserv.accept(); //attente requête client
+				BufferedReader in = new BufferedReader(new InputStreamReader(clients[compteurAttente].getInputStream()));
+				PrintWriter out = new PrintWriter(new OutputStreamWriter(clients[compteurAttente].getOutputStream()),true);
+
+				while((message = in.readLine())==null) ;
 				System.out.println("connexion recue : message "+message+"\n");
 				if(message.equals("103")) {
-					System.out.println("client connecté cpt : "+cpt+"\n");
+					System.out.println("client connecté compteurAttente : "+compteurAttente+"\n");
 
-					if(cpt == 1) { // Lancement partie
+					if(compteurAttente == 1) { // Lancement partie
 						out.println("201");
 						System.out.println("Lancement du thread\n");
-						AppServ appserv = new AppServ(clients[cpt],clients[cpt-1]);
+						PrintWriter out0 = new PrintWriter(new OutputStreamWriter(clients[0].getOutputStream()),true);
+						out0.println("201");
+						AppServ appserv = new AppServ(clients[compteurAttente],clients[compteurAttente-1]);
 						Thread th = new Thread(appserv);
 						th.start();
-						cpt = 0;
+						compteurAttente = 0;
 					} else { // Attente autre joueur
 						out.println("100");
-						cpt++;
+						compteurAttente++;
 					}
 				} else {
 					out.println("400");
-					clients[cpt].close();
+					clients[compteurAttente].close();
 				}
 			}
 		} catch (Exception e) {
@@ -56,6 +59,7 @@ public class AppServ implements Runnable{
 
 	public void run() {
 		try {
+			int[] = new int[9];
 			// creation des flux de communication
 			//joueur 1
 			BufferedReader in1;
@@ -69,15 +73,9 @@ public class AppServ implements Runnable{
 				in2 = new BufferedReader(new InputStreamReader(sockcli2.getInputStream()));
 				out2 = new PrintWriter(new OutputStreamWriter(sockcli2.getOutputStream()),true);
 				
-				String message1 = in1.readLine();
-				out2.println(message1);
-
-				String message2 = in2.readLine();
-				out1.println(message2);
-
-				if(message1.equals("stop") || message2.equals("stop")) {
-					break;
-				}
+				
+				out1.println("202");
+				//ne pas oubblier le break 
 			}
 			sockcli1.close();
 			sockcli2.close();
