@@ -10,10 +10,10 @@ import java.util.Scanner;
 public class ClientMorpion {
     public ClientMorpion (String adresse, int port) {
         try {
-            Socket socketServeur = new Socket(adresse, port);
+            Socket socket = new Socket(adresse, port);
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(socketServeur.getinStream()));
-            PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socketServeur.getOutputStream())), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
                 
             // Demande de connexion
             out.println("103");
@@ -23,8 +23,8 @@ public class ClientMorpion {
 
             Scanner sc = new Scanner(System.in);
                     
-            // 102 : partie terminée
-            while (!message.equals("102"))
+            // 104 : partie terminée
+            while (!message.equals("104"))
             {
                 try
                 {
@@ -61,7 +61,7 @@ public class ClientMorpion {
                 System.out.println(i);
             }
 
-            socketServeur.close();
+            socket.close();
         } catch(IOException e){
             System.out.println("Erreur : " + e);
         }
