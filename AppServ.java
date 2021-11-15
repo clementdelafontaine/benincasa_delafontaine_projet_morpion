@@ -18,7 +18,7 @@ public class AppServ implements Runnable{
 	}
 
 	public static void main(String[] args){
-		Socket[] clients = {};	
+		Socket[] clients = new Socket[2];
 		int cpt = 0;
 		String message = "";
 		try {
@@ -27,21 +27,25 @@ public class AppServ implements Runnable{
 			while(true){
 				clients[cpt] = sockserv.accept(); //attente requête client
 				BufferedReader in = new BufferedReader(new InputStreamReader(clients[cpt].getInputStream()));
+				PrintWriter out = new PrintWriter(new OutputStreamWriter(clients[0].getOutputStream()),true);
 				message = in.readLine();
+				System.out.println("connexion recue : message "+message+"\n");
+				if(message.equals("103")) {
+					System.out.println("client connecté cpt : "+cpt+"\n");
 
-				if(message == "103") {
-					cpt++;
-					PrintWriter out = new PrintWriter(new OutputStreamWriter(clients[0].getOutputStream()),true);
-					if(cpt != 0 && cpt % 2 == 0) { // Attente autre joueur
+					if(cpt == 1) { // Lancement partie
 						out.println("201");
+						System.out.println("Lancement du thread\n");
 						AppServ appserv = new AppServ(clients[cpt],clients[cpt-1]);
 						Thread th = new Thread(appserv);
 						th.start();
 						cpt = 0;
-					} else { // Lancement partie
+					} else { // Attente autre joueur
 						out.println("100");
+						cpt++;
 					}
 				} else {
+					out.println("400");
 					clients[cpt].close();
 				}
 			}

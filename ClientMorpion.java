@@ -19,18 +19,15 @@ public class ClientMorpion {
             out.println("103");
             
             // lecture message d'entree
-            String message = "";            
-
-            Scanner sc = new Scanner(System.in);
+            String message = "";
+            while((message = in.readLine())==null) ;
+            // Scanner sc = new Scanner(System.in);
                     
             // 104 : partie terminée
             while (!message.equals("104"))
             {
                 try
                 {
-                    message = in.readLine();
-                    out.println(message);
-
                     switch (message) {
                         case "100":
                         System.out.println("En attente d'un opposant ... \n");
@@ -48,8 +45,10 @@ public class ClientMorpion {
                         break;
                         case "202":
                         System.out.println("A votre tour, saisir une case : ligne, colonne \n");
+
                         break;
                     }
+                    while((message = in.readLine())==null);
 
                 }
                 catch(IOException i)
