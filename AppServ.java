@@ -18,15 +18,32 @@ public class AppServ implements Runnable{
 	}
 
 	public static void main(String[] args){
+		Socket[] clients = {};	
+		int cpt = 0;
+		String message = "";
 		try {
 				ServerSocket sockserv=null;
 				sockserv = new ServerSocket (1234); //création socket serveur
 			while(true){
-				Socket sockcli1 = sockserv.accept(); //attente requête client
-				Socket sockcli2 = sockserv.accept(); //attente requête client
-				AppServ appserv = new AppServ(sockcli1,sockcli2);
-				Thread th = new Thread(appserv);
-				th.start();
+				clients[cpt] = sockserv.accept(); //attente requête client
+				BufferedReader in = new BufferedReader(new InputStreamReader(clients[cpt].getInputStream()));
+				message = in.readLine();
+
+				if(message == "103") {
+					cpt++;
+					PrintWriter out = new PrintWriter(new OutputStreamWriter(clients[0].getOutputStream()),true);
+					if(cpt != 0 && cpt % 2 == 0) { // Attente autre joueur
+						out.println("201");
+						AppServ appserv = new AppServ(clients[cpt],clients[cpt-1]);
+						Thread th = new Thread(appserv);
+						th.start();
+						cpt = 0;
+					} else { // Lancement partie
+						out.println("100");
+					}
+				} else {
+					clients[cpt].close();
+				}
 			}
 		} catch (Exception e) {
 			System.out.println(e);
