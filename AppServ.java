@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Scanner;
 
 public class AppServ implements Runnable{
 	
@@ -25,21 +26,25 @@ public class AppServ implements Runnable{
 				ServerSocket sockserv=null;
 				sockserv = new ServerSocket (1234); //création socket serveur
 			while(true){
+
 				clients[compteurAttente] = sockserv.accept(); //attente requête client
 				BufferedReader in = new BufferedReader(new InputStreamReader(clients[compteurAttente].getInputStream()));
 				PrintWriter out = new PrintWriter(new OutputStreamWriter(clients[compteurAttente].getOutputStream()),true);
 
+				//Tant que je ne reçoit pas de code, attente.
 				while((message = in.readLine())==null) ;
-				System.out.println("connexion recue : message "+message+"\n");
+
+				System.out.println("Connexion reçue, message : "+ message);
+
 				if(message.equals("103")) {
-					System.out.println("client connecté compteurAttente : "+compteurAttente+"\n");
+					System.out.println("Client connecté, compteurAttente : "+ compteurAttente+"\n");
 
 					if(compteurAttente == 1) { // Lancement partie
 						out.println("201");
 						System.out.println("Lancement du thread\n");
 						PrintWriter out0 = new PrintWriter(new OutputStreamWriter(clients[0].getOutputStream()),true);
 						out0.println("201");
-						AppServ appserv = new AppServ(clients[compteurAttente],clients[compteurAttente-1]);
+						AppServ appserv = new AppServ(clients[compteurAttente-1],clients[compteurAttente]);
 						Thread th = new Thread(appserv);
 						th.start();
 						compteurAttente = 0;
@@ -59,24 +64,35 @@ public class AppServ implements Runnable{
 
 	public void run() {
 		try {
-			int[] = new int[9];
 			// creation des flux de communication
 			//joueur 1
-			BufferedReader in1;
-			PrintWriter out1;
+			BufferedReader in1 = new BufferedReader(new InputStreamReader(sockcli1.getInputStream()));
+			PrintWriter out1 = new PrintWriter(new OutputStreamWriter(sockcli1.getOutputStream()),true);
 			//joueur 2
-			BufferedReader in2;
-			PrintWriter out2;
+			BufferedReader in2 = new BufferedReader(new InputStreamReader(sockcli2.getInputStream()));
+			PrintWriter out2 = new PrintWriter(new OutputStreamWriter(sockcli2.getOutputStream()),true);
 			while (true) {
-				in1 = new BufferedReader(new InputStreamReader(sockcli1.getInputStream()));
-				out1 = new PrintWriter(new OutputStreamWriter(sockcli1.getOutputStream()),true);
-				in2 = new BufferedReader(new InputStreamReader(sockcli2.getInputStream()));
-				out2 = new PrintWriter(new OutputStreamWriter(sockcli2.getOutputStream()),true);
+		
+
+				out1.println("202"); //tour
+				out2.println("101"); //attente
+
+				if(in1.readLine() == "102") {
+					out1.println("102");
+					out2.println("102"); 
+					break;
+				}
+
+				out1.println("101"); //attente
+				out2.println("202"); //tour
 				
-				
-				out1.println("202");
-				//ne pas oubblier le break 
+				if(in2.readLine() == "102") {
+					out1.println("102");
+					out2.println("102"); 
+					break;
+				}
 			}
+			
 			sockcli1.close();
 			sockcli2.close();
 			

@@ -20,6 +20,8 @@ public class ClientMorpion {
             
             // lecture message d'entree
             String message = "";
+
+            //Tant que je ne reçoit pas de code, attente.
             while((message = in.readLine())==null) ;
                     
             // 104 : partie terminée
