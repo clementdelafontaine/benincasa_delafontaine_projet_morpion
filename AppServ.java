@@ -71,22 +71,40 @@ public class AppServ implements Runnable{
 			//joueur 2
 			BufferedReader in2 = new BufferedReader(new InputStreamReader(sockcli2.getInputStream()));
 			PrintWriter out2 = new PrintWriter(new OutputStreamWriter(sockcli2.getOutputStream()),true);
+
+			Morpion jeu = new Morpion();
+			String result;
+			String ligne;
+			String colonne;
+
 			while (true) {
 		
 
 				out1.println("202"); //tour
+				out1.println(jeu.toString());
 				out2.println("101"); //attente
+				out2.println(jeu.toString());
 
-				if(in1.readLine() == "102") {
+				ligne = in1.readLine();
+				colonne = in1.readLine();
+				result = jeu.play(ligne,colonne,1);
+
+				if(result == "102") {
 					out1.println("102");
 					out2.println("102"); 
 					break;
 				}
 
 				out1.println("101"); //attente
+				out1.println(jeu.toString());
 				out2.println("202"); //tour
+				out2.println(jeu.toString());
+
+				ligne = in2.readLine();
+				colonne = in2.readLine();
+				result = jeu.play(ligne,colonne,2);
 				
-				if(in2.readLine() == "102") {
+				if(result == "102") {
 					out1.println("102");
 					out2.println("102"); 
 					break;
