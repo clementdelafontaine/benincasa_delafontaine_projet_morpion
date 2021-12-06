@@ -14,19 +14,27 @@ public class Morpion {
         System.out.println(this);
     }
 
-    public String play(int ligne, int colonne, int noJoueur){
-        // Vérification notOutOfBounds et case non jouée
-        if (ligne < 1 || ligne > 3
-            || colonne < 1 || colonne > 3
-            || plateau[ligne-1][colonne-1] != 0) {
-            return "406";
-        } else {
-            plateau[ligne-1][colonne-1] = noJoueur;
-            if (aGagne(noJoueur))
-                return "102";
-            else 
-                return "200";
-        }
+    public String play(String testLigne, String testColonne, int noJoueur){
+        int ligne, colonne;
+        try {   
+			ligne = Integer.parseInt(testLigne); 
+            colonne = Integer.parseInt(testColonne); 
+
+            // Vérification notOutOfBounds et case non jouée
+            if (ligne < 1 || ligne > 3
+                || colonne < 1 || colonne > 3
+                || plateau[ligne-1][colonne-1] != 0) {
+                return "406";
+            } else {
+                plateau[ligne-1][colonne-1] = noJoueur;
+                if (aGagne(noJoueur))
+                    return "102";
+                else 
+                    return "200";
+            }
+		} catch (NumberFormatException e) { 
+			return "406";
+		} 
     }
 
     public boolean aGagne(int noJoueur){
@@ -37,7 +45,7 @@ public class Morpion {
 
         // Vérification colonnes
         for (int i = 0; i<3; i++) {
-            if (plateau[i][0] == noJoueur && plateau[i][1] == noJoueur && plateau[i][2] == noJoueur) return true;
+            if (plateau[0][i] == noJoueur && plateau[1][i] == noJoueur && plateau[2][i] == noJoueur) return true;
         }
 
         // Vérification diagonales
@@ -66,13 +74,13 @@ public class Morpion {
     public static void main(String[] args) {
         Morpion m1 = new Morpion();
         String status = "";
-        int ligne, colonne;
+        String ligne, colonne;
         Scanner sc = new Scanner(System.in);
         int tourJoueur = 1;
         while (status != "102") {
                 System.out.println("A votre tour joueur "+tourJoueur+", saisir une case : \"ligne colonne\"");
-                ligne = sc.nextInt();
-                colonne = sc.nextInt();
+                ligne = sc.nextLine();
+                colonne = sc.nextLine();
                 status = m1.play(ligne, colonne, tourJoueur);
                 System.out.println("status : "+status+" \n"+m1);
                 if (status == "200") {
