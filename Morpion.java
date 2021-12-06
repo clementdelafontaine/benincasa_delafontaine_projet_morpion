@@ -56,14 +56,17 @@ public class Morpion {
     }
 
     public String toString() {
-        String res = "-------------\n";
+        int i = 1;
+        String res = "    1    2    3\n   -------------\n";
         for (int[] row : plateau) {
+            res += i+"  ";
             for (int box : row) {
                 if (box == 0) res += "|   ";
                 else if (box == 1 ) res += "| X ";
                 else if (box == 2 ) res += "| O ";
             }
-            res += "|\n-------------\n";
+            res += "|\n   -------------\n";
+            i++;
         }
 
         return res;
