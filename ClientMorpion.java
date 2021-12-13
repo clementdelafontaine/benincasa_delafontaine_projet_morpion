@@ -53,10 +53,16 @@ public class ClientMorpion {
                             }
                             n=0;
                         break;
-                        // End of game
                         case "102":
+                            //nettoyage console
+                            System.out.print("\033[H\033[2J");
                             System.out.println("Fin de la partie\n");
                             message = "104";
+                            while (n<9) {
+                                System.out.println(in.readLine());
+                                n++;
+                            }
+                            n=0;
                         break;
                         case "201":
                             System.out.println("Lancement de la partie \n");
@@ -71,14 +77,11 @@ public class ClientMorpion {
                                 n++;
                             }
                             n=0;
+                            //saisie des coordonées jouées et envoi au serveur
                             String ligne = sc.nextLine();
                             String colonne = sc.nextLine();
                             out.println(ligne);
                             out.println(colonne);
-                        break;
-                        case "106":
-                            while((message = in.readLine())==null) ;
-                            System.out.println(message);
                         break;
                     }
                     while(message != "104" && (message = in.readLine())==null){System.out.println("yes");}
@@ -90,6 +93,7 @@ public class ClientMorpion {
                 }
             }
 
+            //fermeture socket côté client
             in.close();
             out.close();
             socket.close();
