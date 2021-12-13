@@ -10,12 +10,11 @@ import java.util.Scanner;
 
 public class AppServ implements Runnable{
 	
-	Socket sockcli1;
-	Socket sockcli2;
+	Socket socketClient[] = new Socket[2];
 
 	AppServ(Socket sockcli1,Socket sockcli2){
-		this.sockcli1 = sockcli1;
-		this.sockcli2 = sockcli2;
+		this.socketClient[0] = sockcli1;
+		this.socketClient[1] = sockcli2;
 	}
 
 	public static void main(String[] args){
@@ -65,54 +64,65 @@ public class AppServ implements Runnable{
 	public void run() {
 		try {
 			// creation des flux de communication
+			BufferedReader[] in = new BufferedReader[2];
+			PrintWriter[] out = new PrintWriter[2];
 			//joueur 1
-			BufferedReader in1 = new BufferedReader(new InputStreamReader(sockcli1.getInputStream()));
-			PrintWriter out1 = new PrintWriter(new OutputStreamWriter(sockcli1.getOutputStream()),true);
+			in[0] = new BufferedReader(new InputStreamReader(socketClient[0].getInputStream()));
+			out[0] = new PrintWriter(new OutputStreamWriter(socketClient[0].getOutputStream()),true);
 			//joueur 2
-			BufferedReader in2 = new BufferedReader(new InputStreamReader(sockcli2.getInputStream()));
-			PrintWriter out2 = new PrintWriter(new OutputStreamWriter(sockcli2.getOutputStream()),true);
+			in[1] = new BufferedReader(new InputStreamReader(socketClient[1].getInputStream()));
+			out[1] = new PrintWriter(new OutputStreamWriter(socketClient[1].getOutputStream()),true);
 
 			Morpion jeu = new Morpion();
-			String result;
 			String ligne;
 			String colonne;
+			String status = "";
+			String symbole[] = new String[2];
+			int tourJoueur = 0;
+			int joueurEnAttente = 1;
+
+			String userInput;
+
+			symbole[0] = "Vous jouez avec les X";
+			symbole[1] = "Vous jouez avec les O";
 
 			while (true) {
-		
+				while (status != "102") {
+					// Envoyer le visuel de la grille de jeu aux joueurs
+					// Traitement joueur en cours
+					out[tourJoueur].println("202"); 
+					out[tourJoueur].println(symbole[tourJoueur]+"\n"+jeu);
+					// Traitement joueur en attente
+					out[joueurEnAttente].println("101");
+					out[joueurEnAttente].println(symbole[joueurEnAttente]+"\n"+jeu);
 
-				out1.println("202"); //tour
-				out1.println(jeu.toString());
-				out2.println("101"); //attente
-				out2.println(jeu.toString());
+					// Réinitialliser buffer du joueur courant
+					
+					// while ((userInput = in[tourJoueur].readLine()) != null) {
+					// 	System.out.println("echo: " + userInput);
+					// }
+					// while(in[tourJoueur].readLine() != null);
 
-				ligne = in1.readLine();
-				colonne = in1.readLine();
-				result = jeu.play(ligne,colonne,1);
-
-				if(result == "102") {
-					out1.println("102");
-					out2.println("102"); 
-					break;
-				}
-
-				out1.println("101"); //attente
-				out1.println(jeu.toString());
-				out2.println("202"); //tour
-				out2.println(jeu.toString());
-
-				ligne = in2.readLine();
-				colonne = in2.readLine();
-				result = jeu.play(ligne,colonne,2);
+					// saisie des données
+					ligne = in[tourJoueur].readLine();
+					colonne = in[tourJoueur].readLine();
+					status = jeu.play(ligne, colonne, tourJoueur+1);
+					System.out.println("status : "+status+" \n"+jeu);
+					// Changement de tour si succès du dernier coup
+					if (status == "200") {
+						tourJoueur = ((tourJoueur == 0) ? 1 : 0);
+						joueurEnAttente = ((tourJoueur == 0) ? 1 : 0);
+						System.out.println("Tour joueur : "+tourJoueur);
+					}
 				
-				if(result == "102") {
-					out1.println("102");
-					out2.println("102"); 
-					break;
-				}
 			}
+
+			// Fin de partie imprimer le dernier état du plateau et quitter
 			
-			sockcli1.close();
-			sockcli2.close();
+			
+			socketClient[0].close();
+			socketClient[1].close();
+			}
 			
 		} catch (Exception e) {
 			System.out.println(e);
