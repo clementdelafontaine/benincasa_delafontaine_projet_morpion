@@ -86,46 +86,44 @@ public class AppServ implements Runnable{
 			symbole[0] = "Vous jouez avec les X";
 			symbole[1] = "Vous jouez avec les O";
 
-			while (true) {
-				while (status != "102") {
-					// Envoyer le visuel de la grille de jeu aux joueurs
-					// Traitement joueur en cours
-					out[tourJoueur].println("202"); 
-					out[tourJoueur].println(symbole[tourJoueur]+"\n"+jeu);
-					// Traitement joueur en attente
-					out[joueurEnAttente].println("101");
-					out[joueurEnAttente].println(symbole[joueurEnAttente]+"\n"+jeu);
+			while (status != "102") {
+				// Vider buffer du joueur courant
+				while ((userInput = in[tourJoueur].readLine()) != null) {
+					System.out.println("echo: " + userInput);
+				}
 
-					// Réinitialliser buffer du joueur courant
-					
-					// while ((userInput = in[tourJoueur].readLine()) != null) {
-					// 	System.out.println("echo: " + userInput);
-					// }
-					// while(in[tourJoueur].readLine() != null);
+				// Envoyer le visuel de la grille de jeu aux joueurs
+				// Traitement joueur en cours
+				out[tourJoueur].println("202");
+				out[tourJoueur].println(symbole[tourJoueur] + "\n" + jeu);
+				// Traitement joueur en attente
+				out[joueurEnAttente].println("101");
+				out[joueurEnAttente].println(symbole[joueurEnAttente] + "\n" + jeu);
 
-					// saisie des données
-					ligne = in[tourJoueur].readLine();
-					colonne = in[tourJoueur].readLine();
-					status = jeu.play(ligne, colonne, tourJoueur+1);
-					System.out.println("status : "+status+" \n"+jeu);
-					// Changement de tour si succès du dernier coup
-					if (status == "200") {
-						tourJoueur = ((tourJoueur == 0) ? 1 : 0);
-						joueurEnAttente = ((tourJoueur == 0) ? 1 : 0);
-						System.out.println("Tour joueur : "+tourJoueur);
-					}
-				
+				// saisie des données
+				ligne = in[tourJoueur].readLine();
+				colonne = in[tourJoueur].readLine();
+				status = jeu.play(ligne, colonne, tourJoueur + 1);
+				System.out.println("status : " + status + " \n" + jeu);
+				// Changement de tour si succès du dernier coup
+				if (status == "200") {
+					tourJoueur = ((tourJoueur == 0) ? 1 : 0);
+					joueurEnAttente = ((tourJoueur == 0) ? 1 : 0);
+					System.out.println("Tour joueur : " + tourJoueur);
+				}
 			}
 
-			// Fin de partie imprimer le dernier état du plateau et quitter
-			
-			
+			// Envoi de la grillet du dernier statut
+			for (PrintWriter pw : out) {
+				pw.println(status);
+				pw.println(jeu);
+			}
+
 			socketClient[0].close();
 			socketClient[1].close();
-			}
-			
+
 		} catch (Exception e) {
 			System.out.println(e);
-		} 
+		}
 	}
 }
