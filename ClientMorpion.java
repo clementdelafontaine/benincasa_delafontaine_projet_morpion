@@ -7,8 +7,19 @@ import java.io.BufferedWriter;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
+/**
+ * Client qui permet de se connecter au serveur de jeu et de rencontrer un adversaire pour une partie de morpion dans le terminal
+ * Par défaut : java ClientMorpion localhost 1234
+ */
 public class ClientMorpion {
-    public ClientMorpion (String adresse, int port) {
+    /**
+     * Création d'une instance, prend en paramètres l'adresse et le port du serveur de jeu
+     * @param adresse String
+     * @param port String
+     */
+    public ClientMorpion (String adresse, String portString) {
+        int port = Integer.parseInt(portString); 
+
         try {
             //création socket client
             Socket socket = new Socket(adresse, port);
@@ -20,7 +31,7 @@ public class ClientMorpion {
             //création du scanner pour l'input client
             Scanner sc = new Scanner(System.in);
 
-            //compteur bidon (utile pour l'affichage du plateau de jeu)
+            //compteur utilé pour l'affichage du plateau de jeu
             int n = 0;
                 
             //demande de connexion
@@ -64,6 +75,17 @@ public class ClientMorpion {
                             }
                             n=0;
                         break;
+                        case "105":
+                            //nettoyage console
+                            System.out.print("\033[H\033[2J");
+                            System.out.println("Fin de la partie - match nul\n");
+                            message = "104";
+                            while (n<9) {
+                                System.out.println(in.readLine());
+                                n++;
+                            }
+                            n=0;
+                        break;
                         case "201":
                             System.out.println("Lancement de la partie \n");
                         break;
@@ -84,7 +106,7 @@ public class ClientMorpion {
                             out.println(colonne);
                         break;
                     }
-                    while(message != "104" && (message = in.readLine())==null){System.out.println("yes");}
+                    while(message != "104" && (message = in.readLine())==null);
 
                 }
                 catch(IOException i)
@@ -105,6 +127,6 @@ public class ClientMorpion {
     }
 
     public static void main(String[] args) throws Exception {
-        ClientMorpion client = new ClientMorpion("localhost", 1234);
+        ClientMorpion client = new ClientMorpion(args[0], args[1]);
     }
 }
