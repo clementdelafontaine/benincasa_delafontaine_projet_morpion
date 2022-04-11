@@ -1,12 +1,10 @@
+import cipher.CryptageMorpion;
+
 import java.net.*;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.Scanner;
 
 /**
  * Serveur de jeu de morpion
@@ -17,6 +15,8 @@ import java.util.Scanner;
 public class AppServ implements Runnable{
 	
 	Socket socketClient[] = new Socket[2];
+	static CryptageMorpion cipher;
+
 
 	/**
 	 * Appserv contient les 2 sockets clients
@@ -37,15 +37,21 @@ public class AppServ implements Runnable{
 		Socket[] clients = new Socket[2];
 		int compteurAttente = 0;
 		String message = "";
+		String encryptedMessage = "";
 
 		try {
+			cipher = new CryptageMorpion();
+
 			ServerSocket sockserv=null;
 			//création socket serveur
 			sockserv = new ServerSocket(port);
 
-			while(true){
+			//Génération de la clé secrète
+			cipher.generateDESKey();
 
-				clients[compteurAttente] = sockserv.accept(); //attente requête client
+			while(true){
+				//attente requête client
+				clients[compteurAttente] = sockserv.accept();
 				BufferedReader in = new BufferedReader(new InputStreamReader(clients[compteurAttente].getInputStream()));
 				PrintWriter out = new PrintWriter(new OutputStreamWriter(clients[compteurAttente].getOutputStream()),true);
 
@@ -58,21 +64,33 @@ public class AppServ implements Runnable{
 				if(message.equals("103")) {
 					System.out.println("Client connecté, compteurAttente : "+ compteurAttente+"\n");
 
+					//Réception clé publique
+					message = in.readLine();
+					System.out.println("clé publique reçue : " + message);
+					cipher.loadPublicKey(message);
+					//Envoi de la clé secrète cryptée
+					String encryptedSecretKey = cipher.getEncryptedSecretKey();
+
+					encryptedSecretKey = encryptedSecretKey.replaceAll("(\\r|\\n)", "");
+					System.out.println("Clé secrète cryptée : " + encryptedSecretKey);
+					out.println(encryptedSecretKey);
+
+
 					if(compteurAttente == 1) { // Lancement partie
-						out.println("201");
+						cipher.cipherAndSendMessage("201", out);
 						System.out.println("Lancement du thread\n");
 						PrintWriter out0 = new PrintWriter(new OutputStreamWriter(clients[0].getOutputStream()),true);
-						out0.println("201");
+						cipher.cipherAndSendMessage("201", out0);
 						AppServ appserv = new AppServ(clients[compteurAttente-1],clients[compteurAttente]);
 						Thread th = new Thread(appserv);
 						th.start();
 						compteurAttente = 0;
 					} else { // Attente autre joueur
-						out.println("100");
+						cipher.cipherAndSendMessage("100", out);
 						compteurAttente++;
 					}
 				} else {
-					out.println("400");
+					cipher.cipherAndSendMessage("400", out);
 					clients[compteurAttente].close();
 				}
 			}
@@ -80,6 +98,8 @@ public class AppServ implements Runnable{
 			System.out.println(e);
 		}
 	}
+
+
 
 	public void run() {
 		try {
@@ -109,20 +129,24 @@ public class AppServ implements Runnable{
 				// Vider le buffer du joueur courant (non implémenté)
 				// Envoyer le visuel de la grille de jeu aux joueurs
 				// Traitement joueur en cours
-				out[tourJoueur].println("202");
-				out[tourJoueur].println(symbole[tourJoueur] + "\n" + jeu);
+				cipher.cipherAndSendMessage("202", out[tourJoueur]);
+				cipher.cipherAndSendMessage(symbole[tourJoueur] + "" + jeu, out[tourJoueur]);
 				// Traitement joueur en attente
-				out[joueurEnAttente].println("101");
-				out[joueurEnAttente].println(symbole[joueurEnAttente] + "\n" + jeu);
+				cipher.cipherAndSendMessage("101", out[joueurEnAttente]);
+				cipher.cipherAndSendMessage(symbole[joueurEnAttente] + "" + jeu, out[joueurEnAttente]);
 
 				// saisie des données
 				ligne = in[tourJoueur].readLine();
+				ligne = cipher.decrypt(ligne);
 				colonne = in[tourJoueur].readLine();
+				colonne = cipher.decrypt(colonne);
+
 				status = jeu.play(ligne, colonne, tourJoueur + 1);
-				System.out.println("status : " + status + " \n" + jeu);
+				System.out.println("status : " + status + " " + jeu);
 				// Changement de joueur si succès du dernier coup
 				if (status == "200") {
 					tourJoueur = ((tourJoueur == 0) ? 1 : 0);
+					joueurEnAttente = ((tourJoueur == 0) ? 1 : 0);
 					joueurEnAttente = ((tourJoueur == 0) ? 1 : 0);
 					System.out.println("Tour joueur : " + tourJoueur);
 				}
@@ -132,8 +156,8 @@ public class AppServ implements Runnable{
 
 			// Envoi de la grillet de fin de partie
 			for (PrintWriter pw : out) {
-				pw.println(status);
-				pw.println(jeu);
+				cipher.cipherAndSendMessage(status, pw);
+				cipher.cipherAndSendMessage(jeu.toString(), pw);
 			}
 
 			socketClient[0].close();

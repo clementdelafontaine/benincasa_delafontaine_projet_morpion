@@ -104,10 +104,12 @@ public class Morpion {
 
     /**
      * Affiche la grille de jeu dans l'état de la partie où la méthode est appelée
+     * Le client remplace les chaines de caractères "retourLigne" par des "\n"
+     * "retourLigne" est utilisé afin de pouvoir utiliser les BufferedReaders et le cryptage
      */
     public String toString() {
         int i = 1;
-        String res = "    1    2    3\n   -------------\n";
+        String res = "retourLigne    1    2    3retourLigne   -------------retourLigne";
         for (int[] row : plateau) {
             res += i+"  ";
             for (int box : row) {
@@ -115,7 +117,7 @@ public class Morpion {
                 else if (box == 1 ) res += "| X ";
                 else if (box == 2 ) res += "| O ";
             }
-            res += "|\n   -------------\n";
+            res += "|retourLigne   -------------retourLigne";
             i++;
         }
 
@@ -137,7 +139,7 @@ public class Morpion {
                 ligne = sc.nextLine();
                 colonne = sc.nextLine();
                 status = m1.play(ligne, colonne, tourJoueur);
-                System.out.println("status : "+status+" \n"+m1);
+                System.out.println("status : "+status+" retourLigne"+m1);
                 if (status == "200") {
                     tourJoueur = ((tourJoueur == 1) ? 2 : 1);
                     System.out.println("Tour joueur : "+tourJoueur);
