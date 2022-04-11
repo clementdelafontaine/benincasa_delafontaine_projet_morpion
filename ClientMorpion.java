@@ -1,3 +1,5 @@
+import cipher.CryptageMorpion;
+
 import java.net.*;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,10 +14,12 @@ import java.util.Scanner;
  * Par défaut : java ClientMorpion localhost 1234
  */
 public class ClientMorpion {
+    CryptageMorpion cipherDES;
+
     /**
      * Création d'une instance, prend en paramètres l'adresse et le port du serveur de jeu
      * @param adresse String
-     * @param port String
+     * @param portString String
      */
     public ClientMorpion (String adresse, String portString) {
         int port = Integer.parseInt(portString); 
@@ -33,9 +37,20 @@ public class ClientMorpion {
 
             //compteur utilé pour l'affichage du plateau de jeu
             int n = 0;
-                
+
+            //creation des clés privés et publiques
+            cipherDES = new CryptageMorpion();
+
             //demande de connexion
             out.println("103");
+
+            //recevoir clé publique du serveur
+
+            //Envoi de la clé secrète
+            out.println(cipherDES.getDESKey());
+
+
+
             
             //variable de stockage pour les codes reçus par le serveur
             String message = "";
