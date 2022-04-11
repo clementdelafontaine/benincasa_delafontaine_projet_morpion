@@ -15,35 +15,67 @@ import javax.crypto.SecretKey;
 
 public class CryptageMorpion {
     KeyGenerator keygen;
-    SecretKey key;
+    SecretKey secretKey;
+    KeyPair keyPair;
     Cipher cipher;
     Cipher decipher;
 
     public CryptageMorpion() {
-        generateDESKey();
-
     }
 
     private void generateDESKey() {
         try {
             this.keygen = KeyGenerator.getInstance("DES");
             this.keygen.init(56);
-            this.key = this.keygen.generateKey();
+            this.secretKey = this.keygen.generateKey();
             this.cipher = Cipher.getInstance("DES");
-            this.cipher.init(1, this.key);
+            this.cipher.init(1, this.secretKey);
             this.decipher = Cipher.getInstance("DES");
-            this.decipher.init(2, this.key);
+            this.decipher.init(2, this.secretKey);
         } catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException e) {
             e.printStackTrace();
         }
     }
 
-    private KeyPair generateKeys() {
+    /**
+     * TODO
+     * @return
+     */
+    public String getEncryptedSecretKey() {
+        return "";
+    }
+
+    private void generateKeys() {
+        keyPair = null;
+
         try {
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
             SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+
+            //Initiallisation
+            keyGen.initialize(2048, random);
+
+            //Génération des clés
+            keyPair = keyGen.generateKeyPair();
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             e.printStackTrace();
+        }
+    }
+
+    public String getPubliKey() {
+        return keyPair.getPublic().toString();
+    }
+
+    /**
+     * TODO
+     * @param publicKeyStringified
+     * @return
+     */
+    public PublicKey loadPublicKey(String publicKeyStringified) {
+        try {
+
+        } catch () {
+
         }
     }
 
@@ -73,6 +105,6 @@ public class CryptageMorpion {
     }
 
     public String getDESKey() {
-        return this.key.toString();
+        return this.secretKey.toString();
     }
 }
