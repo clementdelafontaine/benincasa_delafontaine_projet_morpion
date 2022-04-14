@@ -16,7 +16,7 @@ java morpion.ClientMorpion adresse_serveur numero_port_serveur
 
 ## Structure
 
-
+![diagrame-chiffrage](diagramme-chiffrage.png)
 
 ## Echanges de trames
 
