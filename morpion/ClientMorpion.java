@@ -52,7 +52,6 @@ public class ClientMorpion {
             try {
                 //creation des clés privés et publiques
                 cipher.generateKeyPair();
-                System.out.println("génération de la clé publique : " + cipher.getPubliKey());
                 //demande de connexion
                 out.println("103");
 
@@ -73,13 +72,10 @@ public class ClientMorpion {
                 //tant que je ne reçoit pas de code, attente.
                 while((encryptedMessage = (in.readLine()))==null) ;
 
-                System.out.println("message crypté : " + encryptedMessage);
                 message = cipher.decrypt(encryptedMessage);
-                System.out.println("message décrypté : " + message);
                 //(104 : partie terminée) tant que la partie n'est pas terminée
                 while (!message.equals("104"))
                 {
-                    System.out.println("debut while message : " + message);
                     try
                     {
                         //évaluation des codes reçus par le serveur
@@ -127,13 +123,14 @@ public class ClientMorpion {
 
                         if (message != "104") {
                             message = cipher.decrypt(message);
+                        } else {
+                            System.out.println("Partie terminée");
                         }
                     }
                     catch(IOException i)
                     {
                         System.out.println(i);
                     }
-                    System.out.println("fin while message : " + message);
                 }
             } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
                 e.printStackTrace();

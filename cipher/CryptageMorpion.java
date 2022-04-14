@@ -166,10 +166,8 @@ public class CryptageMorpion {
      */
     public void decryptSecretKey(String message) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         if (!(privateKey == null)) {
-            System.out.println("clé secrète cryptée : " + message);
             byte[] decryptedKey = decipherRSA.doFinal(Base64.getMimeDecoder().decode(message));
             this.secretKey = loadSecretKey(decryptedKey);
-            System.out.println("Clé secrète decryptée : " + Base64.getMimeEncoder().encodeToString(secretKey.getEncoded()));
             initCipherDES();
         }
     }
@@ -200,12 +198,10 @@ public class CryptageMorpion {
      * @throws BadPaddingException
      */
     public String decrypt(String cryptedString) throws IllegalBlockSizeException, BadPaddingException {
-        System.out.println("message crypté : " + cryptedString);
         byte[] cryptedByteMessage = Base64.getMimeDecoder().decode(cryptedString);
 
         String decryptedMessage = decrypt(cryptedByteMessage);
 
-        System.out.println("Message décrypté : " + decryptedMessage);
         return decryptedMessage;
     }
 
@@ -235,10 +231,8 @@ public class CryptageMorpion {
      */
     public void cipherAndSendMessage(String message, PrintWriter out) {
         try {
-            System.out.println("message à crypter : " + message);
             message = encrypt(message);
             message = message.replaceAll("(\\r|\\n)", "");
-            System.out.println("message crypté : " + message);
             out.println(message);
         } catch (IllegalBlockSizeException | InvalidKeyException e) {
             e.printStackTrace();
