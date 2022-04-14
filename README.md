@@ -40,7 +40,7 @@ java morpion.ClientMorpion adresse_serveur numero_port_serveur
 
 - console
 
-![image-20220414153317012](/home/clement/Documents/cours/s1/securite/td6-cipher/benincasa_delafontaine_projet_morpion/img/image-20220414153317012.png)
+![image-20220414153317012](img/image-20220414153317012.png)
 
 - capture de la trame
 
