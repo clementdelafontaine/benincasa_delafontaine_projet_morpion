@@ -18,27 +18,33 @@ java morpion.ClientMorpion adresse_serveur numero_port_serveur
 
 
 
-## Echange de trames
+## Echanges de trames
 
 ### Valeurs données par le serveur dans la console
 
-![image-20220414152717336](/home/clement/snap/typora/57/.config/Typora/typora-user-images/image-20220414152717336.png)
+![image-20220414152717336](img/image-20220414152717336.png)
 
 ### Réception de la clé publique du client sur le serveur en clair
 
-![](/home/clement/snap/typora/57/.config/Typora/typora-user-images/image-20220414152817785.png)
+![](img/image-20220414152817785.png)
 
 ### Envoi de la clé secrète cryptée du serveur vers le client
 
-- Console :![image-20220414153317012](/home/clement/snap/typora/57/.config/Typora/typora-user-images/image-20220414153317012.png)
+- Console :![image-20220414153317012](img/image-20220414153317012.png)
 
 - Capture de la trame :
 
-![image-20220414152952332](/home/clement/snap/typora/57/.config/Typora/typora-user-images/image-20220414152952332.png)
+![image-20220414152952332](img/image-20220414152952332.png)
 
 ### Réception d'une grille de jeu
 
-![image-20220414153231053](/home/clement/snap/typora/57/.config/Typora/typora-user-images/image-20220414153231053.png)
+- console
+
+![image-20220414153317012](/home/clement/Documents/cours/s1/securite/td6-cipher/benincasa_delafontaine_projet_morpion/img/image-20220414153317012.png)
+
+- capture de la trame
+
+![image-20220414153231053](img/image-20220414153231053.png)
 
 ## Description du projet - Partie 1 - Socket client serveur
 
