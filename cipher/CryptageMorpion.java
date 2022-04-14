@@ -30,6 +30,12 @@ public class CryptageMorpion {
     Cipher cipherRSA;
     Cipher decipherRSA;
 
+    /**
+     * Instancie les Cipher pour le DES et le RSA
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     */
     public CryptageMorpion() throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         this.cipherRSA = Cipher.getInstance("RSA");
 
@@ -40,26 +46,40 @@ public class CryptageMorpion {
         this.decipherDES = Cipher.getInstance("DES");
     }
 
+    /**
+     * Génère la clé secrète DES
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     * @throws NoSuchPaddingException
+     */
     public void generateDESKey() throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException {
         if (secretKey == null) {
             this.keygen = KeyGenerator.getInstance("DES");
             this.keygen.init(56);
             this.secretKey = this.keygen.generateKey();
 
-            System.out.println("Clé secrète decryptée : " + Base64.getMimeEncoder().encodeToString(secretKey.getEncoded()));
-
             initCipherDES();
         }
     }
 
     /**
-     * TODO
-     * @return
+     *
+     * @return la clé secrète cryptée avec la clé publique du client
+     * @throws InvalidKeyException
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
      */
     public String getEncryptedSecretKey() throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return encryptSecretKey();
     }
 
+    /**
+     * Génère une paire de clés RSA pour le client
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchProviderException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
+     */
     public void generateKeyPair() throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException, InvalidKeyException {
         keyPair = null;
 
@@ -94,9 +114,11 @@ public class CryptageMorpion {
     }
 
     /**
-     * TODO
+     * Charge la clé publique reçue en String
      * @param publicKeyStringified
-     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
+     * @throws InvalidKeyException
      */
     public void loadPublicKey(String publicKeyStringified) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException {
         byte[] buffer = Base64.getMimeDecoder().decode(publicKeyStringified);
@@ -109,17 +131,39 @@ public class CryptageMorpion {
         System.out.println("nouvelle clé publique chargée : " + getPubliKey());
     }
 
+    /**
+     * Encrypte un message en DES
+     * @param message
+     * @return
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     * @throws InvalidKeyException
+     */
     public String encrypt(String message) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         byte[] bytePhrase = message.getBytes(StandardCharsets.UTF_8);
         return Base64.getMimeEncoder().encodeToString(this.cipherDES.doFinal(bytePhrase));
     }
 
+    /**
+     * Encrypte la clé secrète
+     * @return la clé secrète cryptée encodée en String
+     * @throws InvalidKeyException
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     */
     public String encryptSecretKey() throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         cipherRSA.init(Cipher.ENCRYPT_MODE, publicKey);
 
         return Base64.getMimeEncoder().encodeToString(cipherRSA.doFinal(secretKey.getEncoded()));
     }
 
+    /**
+     * Décode la chaine de caractères et décrypte la clé secrète pour la stocker
+     * @param message
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     * @throws InvalidKeyException
+     */
     public void decryptSecretKey(String message) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         if (!(privateKey == null)) {
             System.out.println("clé secrète cryptée : " + message);
@@ -130,15 +174,31 @@ public class CryptageMorpion {
         }
     }
 
+    /**
+     * Initialisation du cipher DES
+     * @throws InvalidKeyException
+     */
     private void initCipherDES() throws InvalidKeyException {
         this.cipherDES.init(1, this.secretKey);
         this.decipherDES.init(2, this.secretKey);
     }
 
+    /**
+     * Chqrge la clé secrète depuis un tableau de byte
+     * @param encodedKey
+     * @return
+     */
     private SecretKey loadSecretKey(byte[] encodedKey) {
         return new SecretKeySpec(encodedKey, 0, encodedKey.length, "DES");
     }
 
+    /**
+     * Décrypte le message passé en paramètre avec la clé secrète DES
+     * @param cryptedString
+     * @return le message décrypté
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     */
     public String decrypt(String cryptedString) throws IllegalBlockSizeException, BadPaddingException {
         System.out.println("message crypté : " + cryptedString);
         byte[] cryptedByteMessage = Base64.getMimeDecoder().decode(cryptedString);
@@ -149,14 +209,30 @@ public class CryptageMorpion {
         return decryptedMessage;
     }
 
+    /**
+     * Décrypte le tableau de byte passé en paramètre
+     * @param cryptedMessage
+     * @return  la chaine de caractère décryptée
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     */
     public String decrypt(byte[] cryptedMessage) throws IllegalBlockSizeException, BadPaddingException {
         return new String(this.decipherDES.doFinal(cryptedMessage), StandardCharsets.UTF_8);
     }
 
+    /**
+     *
+     * @return la clé DES en chaine de caractères
+     */
     public String getDESKey() {
         return this.secretKey.toString();
     }
 
+    /**
+     * Encrypte et envoie le message via le PrintWriter passés en paramètres
+     * @param message
+     * @param out
+     */
     public void cipherAndSendMessage(String message, PrintWriter out) {
         try {
             System.out.println("message à crypter : " + message);

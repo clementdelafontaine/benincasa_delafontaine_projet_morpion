@@ -1,7 +1,7 @@
 # LP APIDAE - Réseau
 ## Lancer le serveur
 ```bash
-java AppServ [numero_port]
+java morpion.AppServ [numero_port]
 ```
 
 
@@ -9,7 +9,7 @@ java AppServ [numero_port]
 ## Lancer un client
 
 ```bash
-java ClientMorpion adresse_serveur numero_port_serveur
+java morpion.ClientMorpion adresse_serveur numero_port_serveur
 ```
 
 
